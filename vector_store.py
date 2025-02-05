@@ -1,13 +1,28 @@
-from langchain_community.vectorstores import SKLearnVectorStore
+
+from dotenv import load_dotenv
 from langchain_openai import OpenAIEmbeddings
 from knowledge_base import doc_splits
-from dotenv import load_dotenv
+from langchain_community.vectorstores import Chroma
 
 load_dotenv()
 
-vectorstore = SKLearnVectorStore.from_documents(
+#Persisith_path ile DB tarafında belirli ve kalıcı bir base oluşturabilirsin.
+#kullanımı için from_documents kütüphanesini incele
+
+
+vectorstore = Chroma.from_documents(
     documents=doc_splits,
-    embedding=OpenAIEmbeddings(openai_api_key="YOUR_API_KEY"),
+    embedding=OpenAIEmbeddings(),
+    collection_name="rag-chroma",
+    persist_directory="./.chroma1"
 )
 
-retriever = vectorstore.as_retriever(k=4)
+
+retriever = Chroma(
+    collection_name="rag-chroma",
+    persist_directory="./.chroma1",
+    embedding_function=OpenAIEmbeddings(),
+).as_retriever()
+
+
+

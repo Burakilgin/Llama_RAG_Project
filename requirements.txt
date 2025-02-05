@@ -5,3 +5,8 @@ scikit-learn
 langchain-ollama
 pypdf
 bs4
+langchain_core
+python-dotenv
+pandas
+pyarrow
+chroma
