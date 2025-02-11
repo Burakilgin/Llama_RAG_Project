@@ -1,4 +1,3 @@
-
 from dotenv import load_dotenv
 from langchain_openai import OpenAIEmbeddings
 from knowledge_base import doc_splits

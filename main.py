@@ -1,10 +1,17 @@
-from langchain.memory import ConversationBufferMemory
+import uvicorn
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 from langchain_core.messages import HumanMessage
 from prompt_temp import llm
 from vector_store import retriever
 from prompt_temp import rag_chain
-from memory import with_message_history,config
-from langchain.chains import ConversationChain
+from memory import with_message_history
+
+app = FastAPI()
+
+class QuestionRequest(BaseModel):
+    question: str
+    mode: str
 
 class RAGApplication:
 
@@ -13,56 +20,38 @@ class RAGApplication:
         self.retriever = retriever
         self.rag_chain = rag_chain
 
+    def run_rag(self, question):
 
-    def run(self, question):
+        documents = self.retriever.invoke(question)
+        doc_texts = "\n".join([doc.page_content for doc in documents])
+        response = self.rag_chain.invoke({"question": question, "documents": doc_texts})
 
-        if ans=="y" or ans== "Y":
-            documents = self.retriever.invoke(question)
-            doc_texts = "\\n".join([doc.page_content for doc in documents])
-            response = self.rag_chain.invoke({"question": question, "documents": doc_texts})
-            return response
+        return response
 
-        elif ans =="n" or ans== "N":
-            documents = self.retriever.invoke(question)
-            doc_texts = "\\n".join([doc.page_content for doc in documents])
-            response = self.with_message_history.invoke(
-                [
-                    HumanMessage(content=question)
-                ],
-                config= config
-            )
-            return response
+    def run_chat(self, question, session_id="123"):
 
+        response = self.with_message_history.invoke(
+            [
+                HumanMessage(content=question)
+            ],
+            config={"configurable": {"session_id": session_id}},
+        )
 
-    def chat(self,user_input):
-        response_chat = self.conversation_chain.run(user_input)
-        return response_chat
+        return response
 
-memory = ConversationBufferMemory()
-conversation_chain = ConversationChain(llm=llm, memory=memory)
 
 rag_application = RAGApplication(retriever, rag_chain)
 
 
-if __name__=="__main__":
+@app.post("/ask")
+async def ask_question(request: QuestionRequest):
+    if request.mode.lower() == "rag":
+        response = rag_application.run_rag(request.question)
+    elif request.mode.lower() == "chat":
+        response = rag_application.run_chat(request.question)
 
-    ans= input("What do you want to do? Y: RAG SYSTEM N: MEMORY SYSTEM")
+    return {"question": request.question, "answer": response}
 
-    while True:
 
-        if ans== "Y" or ans=="y":
-            question = input("What's your RAG question?\n")
-            response = rag_application.run(question)
-            print("Question:", question)
-            print("Answer:", response)
-
-        elif ans== "N" or "n":
-            question= input("What's your memory question?\n")
-            response =  rag_application.run(question)
-            print("Answer: ", response.content)
-
-        elif ans == "chat":
-            user_input = input("You: ")
-            response = rag_application.chat(question)
-            print("AI:", response)
-
+if __name__ == "__main__":
+    uvicorn.run(app, port=8000)
