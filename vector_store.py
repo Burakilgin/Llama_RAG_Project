@@ -1,4 +1,3 @@
-
 from dotenv import load_dotenv
 from langchain_openai import OpenAIEmbeddings
 from knowledge_base import doc_splits
@@ -23,6 +22,3 @@ retriever = Chroma(
     persist_directory="./.chroma1",
     embedding_function=OpenAIEmbeddings(),
 ).as_retriever()
-
-
-
