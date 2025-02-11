@@ -3,7 +3,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 
 source = [
-"D:\\Burak_Files\\PyCharm_Calismalari\\ASC2012-Cenk_Hoca_Makale.pdf"
+"YOUR-FILE-PATH"
 ]
 
 docs = [PyPDFLoader(url).load() for url in source]
