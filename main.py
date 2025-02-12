@@ -2,7 +2,6 @@ import uvicorn
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from langchain_core.messages import HumanMessage
-from prompt_temp import llm
 from vector_store import retriever
 from prompt_temp import rag_chain
 from memory import with_message_history
