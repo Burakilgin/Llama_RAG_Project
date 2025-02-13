@@ -12,15 +12,14 @@ vectorstore = Chroma.from_documents(
     documents=doc_splits,
     embedding=embedding,
     collection_name="rag-chroma",
-    persist_directory="./.chroma2"
+    persist_directory="./.chroma4"
 )
 
 
 retriever = Chroma(
     collection_name="rag-chroma",
-    persist_directory="./.chroma2",
+    persist_directory="./.chroma4",
     embedding_function=embedding,
-).as_retriever()
-
+).as_retriever(k=4)
 
 
