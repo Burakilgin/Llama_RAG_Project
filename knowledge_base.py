@@ -3,7 +3,7 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 
 source = [
-"D:\\Burak_Files\\PyCharm_Calismalari\\Rag_For_LLM.pdf"
+"YOUR_FILE_PATH"
 ]
 
 docs = [PyPDFLoader(url).load() for url in source]
