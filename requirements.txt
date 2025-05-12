@@ -18,3 +18,4 @@ torch
 huggingface
 transformers
 sentence-transformers
+langchain-chroma
